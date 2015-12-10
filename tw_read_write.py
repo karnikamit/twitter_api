@@ -16,7 +16,7 @@ class Twitter:
     def __init__(self, screen_name):
         self.app_route = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
         configfile = simpleconfigparser()
-        configfile.read(self.app_route+'/twitter/twitter.ini')
+        configfile.read(self.app_route+'/twitter_api/twitter/twitter.ini')
         self.screen_name = screen_name
         self.base_url = 'https://api.twitter.com/1.1/statuses/update.json?status='
         self.access_token = configfile.login.access_token
@@ -47,12 +47,6 @@ class Twitter:
         headers = dict()
         headers['Authorization'] = b'Bearer ' + self.get_bearer()
         headers["Content-Type"] = b'application/x-www-form-urlencoded;charset=UTF-8'
-        result = requests.post(self.base_url, headers=headers, params={'status': 'my first tweet'},
+        result = requests.post(self.base_url, headers=headers, params={'status': status},
                                data=b'grant_type=client_credentials')
         return result
-        
-
-s = Twitter(screen_name)
-tweets = s.get_tweets(10)
-for tweet in range(len(tweets)):
-    print tweets[tweet]['text']
