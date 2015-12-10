@@ -1,9 +1,9 @@
 
-* Programmatic access to read and write Twitter data
-
+Programmatic access to read and write Twitter data
+==================================================
 
 How to build & run:
-===================
+-------------------
 
 * Create python virtual environment.
     ::
