@@ -1,4 +1,6 @@
-__author__ = 'karnikamit'
+# -*- coding: utf-8 -*-
+__author__ = "karnikamit"
+
 import tweepy
 import time
 import os
@@ -43,21 +45,22 @@ class TweeBot:
 
         return 'done!'
 
-    def search(self, word):
+    def search(self, word, no_of_tweets):
         """
 
-        :param word:
-        :return:
+        :param word: query word
+        :param no_of_tweets: int
+        :return: [{screen_name: tweet}, {},...]
         """
         tweets = []
         try:
-            word_search = self.api.search(q=word, lang='en', result_type='recent', count=10, max_id='')
+            word_search = self.api.search(q=word, lang='en', result_type='recent', count=no_of_tweets)
         except Exception, e:
-            tweets.append('Exception: %s' % e)
+            tweets.append({'Error': 'Exception: %s' % e})
         else:
             tweets = [{s.user.screen_name: s.text} for s in word_search]
         return tweets
 
 if __name__ == '__main__':
     t = TweeBot()
-    print t.search('mondaymotivation')
+    print t.search('mondaymotivation', 10)
