@@ -2,7 +2,7 @@
 __author__ = "karnikamit"
 
 import tweepy
-import time
+import datetime
 import os
 from simpleconfigparser import simpleconfigparser
 from elasticsearch import Elasticsearch
@@ -21,6 +21,7 @@ class TweeBot:
         auth.set_access_token(self.access_token, self.access_token_secret)
         self.api = tweepy.API(auth)
         self.es = Elasticsearch()
+        self.today = datetime.datetime.now().date().strftime('%Y-%m-%d')
 
     def tweet(self, tweet=None, mode="status", file=None):
 
@@ -50,7 +51,7 @@ class TweeBot:
             try:
                 self.api.update_status(status=tweet)
             except Exception, e:
-                print "Exception while tweeting, ", e.message
+                print "Exception while tweeting: %s" % e
 
         return 'done!'
 
@@ -68,7 +69,7 @@ class TweeBot:
             tweets.append({'Error': 'Exception: %s' % e})
         else:
             tweets = [{s.user.screen_name: s.text} for s in word_search]
-            tw_body = {'search_word': word, 'tweets': json.dumps(tweets)}
+            tw_body = {'search_word': word, 'tweets': json.dumps(tweets), 'date': self.today}
             self.es.index(index='twitter', doc_type='search', body=tw_body)
         return tweets
 
@@ -87,10 +88,36 @@ class TweeBot:
             details['Error'] = 'Exception: %s' % e
         return details
 
-    def get_timeline(self, tweets):
+    def get_timeline(self, no_tweets):
         """
 
-        :param tweets: number of tweets (int)
+        :param no_tweets: number of tweets (int)
         :return: [tweets...]
         """
-        return [i.text for i in self.api.home_timeline(count=tweets)]
+        return [i.text for i in self.api.home_timeline(count=no_tweets)]
+
+    def get_tweets(self, screen_name, no_tweets):
+        """
+
+        :param screen_name:
+        :param no_tweets:
+        :return:
+        """
+        tweets = []
+        try:
+            tweets = self.api.user_timeline(screen_name=screen_name, count=no_tweets)
+        except Exception, e:
+            tweets.append('Exception: %s' % e)
+        else:
+            tweets = [i.text for i in tweets]
+
+            t_body = {'tweets': tweets, 'date': self.today, 'screen_name': screen_name, 'no_tweets': no_tweets}
+            try:
+                self.es.index(index='twitter', doc_type='get_tweets', body=t_body)
+            except Exception, e:
+                print 'Exception while indexing: %s' % e
+        return tweets
+
+if __name__ == '__main__':
+    d = TweeBot()
+    print d.get_tweets('@TheSongMsgs', 10)
