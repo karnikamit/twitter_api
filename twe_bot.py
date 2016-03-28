@@ -42,3 +42,22 @@ class TweeBot:
                 print "Exception while tweeting, ", e.message
 
         return 'done!'
+
+    def search(self, word):
+        """
+
+        :param word:
+        :return:
+        """
+        tweets = []
+        try:
+            word_search = self.api.search(q=word, lang='en', result_type='recent', count=10, max_id='')
+        except Exception, e:
+            tweets.append('Exception: %s' % e)
+        else:
+            tweets = [{s.user.screen_name: s.text} for s in word_search]
+        return tweets
+
+if __name__ == '__main__':
+    t = TweeBot()
+    print t.search('mondaymotivation')
