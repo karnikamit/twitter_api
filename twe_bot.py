@@ -72,7 +72,17 @@ class TweeBot:
             self.es.index(index='twitter', doc_type='search', body=tw_body)
         return tweets
 
-
-if __name__ == '__main__':
-    t = TweeBot()
-    print t.search('mondaymotivation', 10)
+    def get_user_details(self, user):
+        u = self.api.search_users(q=user)
+        details = dict()
+        try:
+            user_info = u[0]
+            details = {'friends_count': user_info.friends_count,
+                       'location': user_info.location,
+                       'description': user_info.description,
+                       'favourites_count': user_info.favourites_count,
+                       'name': user_info.name,
+                       'followers_count': user_info.followers_count}
+        except Exception, e:
+            details['Error'] = 'Exception: %s' % e
+        return details
