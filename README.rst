@@ -1,6 +1,6 @@
 
-Programmatic access to read and write Twitter data
-==================================================
+Read, search and write Twitter data
+===================================
 
 How to build & run:
 -------------------
