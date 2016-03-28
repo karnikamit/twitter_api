@@ -86,3 +86,11 @@ class TweeBot:
         except Exception, e:
             details['Error'] = 'Exception: %s' % e
         return details
+
+    def get_timeline(self, tweets):
+        """
+
+        :param tweets: number of tweets (int)
+        :return: [tweets...]
+        """
+        return [i.text for i in self.api.home_timeline(count=tweets)]
