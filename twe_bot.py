@@ -5,7 +5,8 @@ import tweepy
 import time
 import os
 from simpleconfigparser import simpleconfigparser
-
+from elasticsearch import Elasticsearch
+import json
 
 class TweeBot:
     def __init__(self):
@@ -19,6 +20,7 @@ class TweeBot:
         auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
         auth.set_access_token(self.access_token, self.access_token_secret)
         self.api = tweepy.API(auth)
+        self.es = Elasticsearch()
 
     def tweet(self, tweet=None, mode="status", file=None):
 
@@ -26,15 +28,22 @@ class TweeBot:
             file_open = open(file, 'r')       # Path to the file which u want to tweet.
             f = file_open.readlines()
             file_open.close()
+            i = 0
             for line in f:
+                line = line.encode('ascii', 'ignore')
+                if i == 10:
+                    break
+                if not line:
+                    i -= 1
+                    continue
+
                 if len(line) > 140:
                     line = line[:140]
                 try:
                     self.api.update_status(status=line)
-                    time.sleep(2)
                 except Exception, e:
-                    print "Exception", e.message
-                    pass
+                    print "Exception: %s" % e
+                i += 1
         elif mode == "status":
             if len(tweet) > 140:
                 tweet = tweet[:140]
@@ -59,7 +68,10 @@ class TweeBot:
             tweets.append({'Error': 'Exception: %s' % e})
         else:
             tweets = [{s.user.screen_name: s.text} for s in word_search]
+            tw_body = {'search_word': word, 'tweets': json.dumps(tweets)}
+            self.es.index(index='twitter', doc_type='search', body=tw_body)
         return tweets
+
 
 if __name__ == '__main__':
     t = TweeBot()
