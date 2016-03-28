@@ -1,5 +1,5 @@
-__author__ = 'amit'
-from tw_read_write import Twitter
+# -*- coding: utf-8 -*-
+__author__ = "karnikamit"
 from twe_bot import TweeBot
 
 action = raw_input("What do you want to do? read/tweet/search: ")
@@ -7,10 +7,8 @@ dexter = TweeBot()
 if action == "read":
     screen_name = raw_input("ip screen_name: ")
     no_tweets = int(raw_input("number of tweets required: "))
-    t = Twitter(screen_name)
-    tweets = t.get_tweets(no_tweets)
-    for tweet in tweets:
-        print tweet["text"]
+    tws = dexter.get_tweets(screen_name, no_tweets)
+    print tws
 
 elif action == "tweet":
     mode = raw_input("Do you want to tweet from the file? Y/n ")

@@ -117,7 +117,3 @@ class TweeBot:
             except Exception, e:
                 print 'Exception while indexing: %s' % e
         return tweets
-
-if __name__ == '__main__':
-    d = TweeBot()
-    print d.get_tweets('@TheSongMsgs', 10)
